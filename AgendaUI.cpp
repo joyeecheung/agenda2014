@@ -62,7 +62,7 @@ bool AgendaUI::executeOperation(std::string op) {
                                         "dm", "da"
                                        };
       nextop = getCmd();
-      
+
       if (nextop == ops[LogOut]) {
         userLogOut();
       } else if (nextop == ops[DeleteAccount]) {
@@ -97,10 +97,34 @@ bool AgendaUI::executeOperation(std::string op) {
 
 void AgendaUI::userLogIn(void) {
   std::string userName, password;
+  char buffer[256];
 
   std::cout << "[log in] [user name] [password]\n";
   std::cout << "[log in] ";
-  std::cin >> userName >> password;
+  // std::cin >> userName >> password;
+  std::cin.getline(buffer, 256, '\n');
+  std::cin.getline(buffer, 256, '\n');
+
+  // std::cout << '"' << buffer << '"' << '\n';
+  int len = 0, i = 0;
+  while(buffer[len] != '\0') len++;
+
+  // std::cout << len << '\n';
+  for (i = len; i >= 0; i--) {
+    if (buffer[i] == ' ') {
+      password = std::string(buffer + i + 1, len - i - 1);
+      userName = std::string(buffer, i);
+      // std::cout << "i = " << i << '\n';
+      break;
+    }
+  }
+
+  if (i <= 0) {
+    userName = std::string(buffer);
+  }
+
+  // std::cout << "username = \"" << userName << "\"\npassword = \"" << password << "\"\n";
+
   if (agendaService_.userLogIn(userName, password)) {
     currentUser_ = new User(userName, password, std::string(), std::string());
     std::cout << "[log in] succeed!\n";
@@ -145,13 +169,16 @@ void AgendaUI::listAllUsers(void) {
   std::list<User> users = agendaService_.listAllUsers();
 
   std::cout << "[list all users]\n\n";
-  std::cout << std::setiosflags(std::ios::left) << std::setfill(' ')
-            << std::setw(8) << "name" << std::setw(16) << "email"
-            << std::setw(11) << "phone" << '\n';
+  // std::cout << std::setiosflags(std::ios::left) << std::setfill(' ')
+  //           << std::setw(8) << "name" << std::setw(16) << "email"
+  //           << std::setw(11) << "phone" << '\n';
+  std::cout << "name\temail\tphone\n";
   for (auto it : users) {
-    std::cout << std::setiosflags(std::ios::left) << std::setfill(' ')
-              << std::setw(8) << it.getName() << std::setw(16)
-              << it.getEmail() << std::setw(11) << it.getPhone() << '\n';
+    // std::cout << std::setiosflags(std::ios::left) << std::setfill(' ')
+    //           << std::setw(8) << it.getName() << std::setw(16)
+    //           << it.getEmail() << std::setw(11) << it.getPhone() << '\n';
+    std::cout << it.getName() << '\t'
+              << it.getEmail() << '\t' << it.getPhone() << '\n';
   }
 }
 
@@ -188,10 +215,13 @@ void AgendaUI::listAllParticipateMeetings(void) {
 }
 
 void AgendaUI::queryMeetingByTitle(void) {
-  std::string title;
   std::cout << "[query meeting] [title]:\n"
             << "[query meeting] ";
-  std::cin >> title;
+
+  char buffer[256];
+  std::cin.getline(buffer, 256, '\n');
+  std::cin.getline(buffer, 256, '\n');
+  std::string title = std::string(buffer);
 
   printMeetings(agendaService_.meetingQuery(title));
 }
@@ -210,8 +240,12 @@ void AgendaUI::queryMeetingByTimeInterval(void) {
 void AgendaUI::deleteMeetingByTitle(void) {
   std::cout << "[delete meeting] [title]\n"
             << "[delete meeting] ";
-  std::string title;
-  std::cin >> title;
+
+  char buffer[256];
+  std::cin.getline(buffer, 256, '\n');
+  std::cin.getline(buffer, 256, '\n');
+  std::string title = std::string(buffer);
+
   if (agendaService_.deleteMeeting(currentUser_->getName(), title))
     std::cout << "[delete meeting by title] succeed!\n";
   else
@@ -226,17 +260,21 @@ void AgendaUI::deleteAllMeetings(void) {
 }
 
 void AgendaUI::printMeetings(std::list<Meeting> meetings) {
-  std::cout << std::setiosflags(std::ios::left) << std::setfill(' ')
-            << std::setw(15) << "title" << std::setw(15) << "sponsor"
-            << std::setw(15) << "participator" << std::setw(20) << "start time"
-            << std::setw(20) << "end time" << '\n';
-
+  // std::cout << std::setiosflags(std::ios::left) << std::setfill(' ')
+  //           << std::setw(15) << "title" << std::setw(15) << "sponsor"
+  //           << std::setw(15) << "participator" << std::setw(20) << "start time"
+  //           << std::setw(20) << "end time" << '\n';
+  std::cout << "title\tsponsor\tparticipator\tstart time\tend time\n";
   for (auto it : meetings) {
-    std::cout << std::setiosflags(std::ios::left) << std::setfill(' ')
-              << std::setw(15) << it.getTitle() << std::setw(15) << it.getSponsor()
-              << std::setw(15) << it.getParticipator()
-              << std::setw(20) << Date::dateToString(it.getStartDate())
-              << std::setw(20) << Date::dateToString(it.getEndDate()) << '\n';
+    // std::cout << std::setiosflags(std::ios::left) << std::setfill(' ')
+    //           << std::setw(15) << it.getTitle() << std::setw(15) << it.getSponsor()
+    //           << std::setw(15) << it.getParticipator()
+    //           << std::setw(20) << Date::dateToString(it.getStartDate())
+    //           << std::setw(20) << Date::dateToString(it.getEndDate()) << '\n';
+    std::cout << it.getTitle() << '\t' << it.getSponsor() << '\t'
+              << it.getParticipator() << '\t'
+              << Date::dateToString(it.getStartDate()) << '\t'
+              << Date::dateToString(it.getEndDate()) << '\n';
   }
 }
 
