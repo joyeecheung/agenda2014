@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 
-AgendaUI::AgendaUI(): currentUser_(NULL), agendaService_() {
+AgendaUI::AgendaUI(): userName_(), userPassword_(), agendaService_() {
   startAgenda();
 }
 
@@ -51,7 +51,7 @@ bool AgendaUI::executeOperation(std::string op) {
   } else if (op == actions[0]) {
     userLogIn();
 
-    while (currentUser_ != NULL) {
+    while (userName_ != "") {
       std::string nextop;
       enum opnumber {LogOut = 0, DeleteAccount, ListUsers, CreateMeeting,
                      ListMeeting, ListSMeeting, ListPMeeting, QueryMeeting,
@@ -126,7 +126,8 @@ void AgendaUI::userLogIn(void) {
   // std::cout << "username = \"" << userName << "\"\npassword = \"" << password << "\"\n";
 
   if (agendaService_.userLogIn(userName, password)) {
-    currentUser_ = new User(userName, password, std::string(), std::string());
+    userName_ = userName;
+    userPassword_ = password;
     std::cout << "[log in] succeed!\n";
   } else {
     std::cout << "[error] log in fail!\n";
@@ -151,13 +152,13 @@ void AgendaUI::quitAgenda(void) {
 }
 
 void AgendaUI::userLogOut(void) {
-  delete currentUser_;
-  currentUser_ = NULL;
+  userName_ = "";
+  userPassword_ = "";
 }
 
 void AgendaUI::deleteUser(void) {
-  if (agendaService_.deleteUser(currentUser_->getName(),
-    currentUser_->getPassword())) {
+  if (agendaService_.deleteUser(userName_,
+    userPassword_)) {
     userLogOut();
     std::cout << "[delete Agenda account] succeed!\n";
   } else {
@@ -190,7 +191,7 @@ void AgendaUI::createMeeting(void) {
             << "[end time(yyyy-mm-dd/hh:mm)]\n"
             << "[create meeting] ";
   std::cin >> title >> participator >> stime >> etime;
-  if (agendaService_.createMeeting(currentUser_->getName(), title,
+  if (agendaService_.createMeeting(userName_, title,
                                    participator, stime, etime))
     std::cout << "[create meeting] succeed!\n";
   else
@@ -199,19 +200,19 @@ void AgendaUI::createMeeting(void) {
 
 void AgendaUI::listAllMeetings(void) {
   std::cout << "[list all meetings]\n\n";
-  printMeetings(agendaService_.listAllMeetings(currentUser_->getName()));
+  printMeetings(agendaService_.listAllMeetings(userName_));
 }
 
 void AgendaUI::listAllSponsorMeetings(void) {
   std::cout << "[list all sponsor meetings]\n\n";
   printMeetings(
-    agendaService_.listAllSponsorMeetings(currentUser_->getName()));
+    agendaService_.listAllSponsorMeetings(userName_));
 }
 
 void AgendaUI::listAllParticipateMeetings(void) {
   std::cout << "[list all participate meetings]\n\n";
   printMeetings(
-    agendaService_.listAllParticipateMeetings(currentUser_->getName()));
+    agendaService_.listAllParticipateMeetings(userName_));
 }
 
 void AgendaUI::queryMeetingByTitle(void) {
@@ -233,7 +234,7 @@ void AgendaUI::queryMeetingByTimeInterval(void) {
             << "[query meetings] ";
   std::cin >> stime >> etime;
 
-  printMeetings(agendaService_.meetingQuery(currentUser_->getName(),
+  printMeetings(agendaService_.meetingQuery(userName_,
                 stime, etime));
 }
 
@@ -246,14 +247,14 @@ void AgendaUI::deleteMeetingByTitle(void) {
   std::cin.getline(buffer, 256, '\n');
   std::string title = std::string(buffer);
 
-  if (agendaService_.deleteMeeting(currentUser_->getName(), title))
+  if (agendaService_.deleteMeeting(userName_, title))
     std::cout << "[delete meeting by title] succeed!\n";
   else
     std::cout << "[error] delete meeting fail!\n";
 }
 
 void AgendaUI::deleteAllMeetings(void) {
-  if (agendaService_.deleteAllMeetings(currentUser_->getName()))
+  if (agendaService_.deleteAllMeetings(userName_))
     std::cout << "[delete all meetings] succeed!\n";
   else
     std::cout << "[error] delete meetings fail!\n";
@@ -295,7 +296,7 @@ std::string AgendaUI::getCmd(void) {
             << "dm  - delete meeting by title\n"
             << "da  - delete all meetings\n"
             << "-------------------------------------------------------\n"
-            << "\nAgenda@" << currentUser_->getName() << " : # ";
+            << "\nAgenda@" << userName_ << " : # ";
   std::cin >> cmd;
   std::cout << '\n';
   return cmd;

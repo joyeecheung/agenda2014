@@ -32,7 +32,8 @@ class AgendaUI {
   // own functions
   std::string getCmd(void);
   // dates
-  User *currentUser_;
+  std::string userName_;
+  std::string userPassword_;
   AgendaService agendaService_;
 };
 
