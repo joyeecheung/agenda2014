@@ -27,7 +27,7 @@ class Storage {
 	// TODO:...
   public:
     // singleton
-    Storage& GetInstance(void);
+    static Storage* GetInstance(void);
 	~Storage();
 	// CRUD for User & Meeting using C++11 Lambda Expressions
 	void CreateUser(const User&);

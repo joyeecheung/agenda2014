@@ -1,95 +1,107 @@
 #include "Storage.h"
 
-Storage::DISALLOW_COPY_AND_ASSIGN(Storage)
-{
+Storage* Storage::instance_ = nullptr;
 
+Storage::Storage() {
+  if (ReadFromFile("agenda.data") == false) {
+    userList_.clear();
+    meetingList_.clear();
+  }
 }
 
-Storage::Storage()
-{
-
+Storage* Storage::GetInstance(void) {
+  if (!instance_) {
+    instance_ = new Storage();
+  }
+  return instance_;
 }
 
-// File IO
-bool Storage::ReadFromFile(char *fpath)
-{
-
+Storage::~Storage() {
+  WriteToFile("agenda.data");
 }
 
-bool Storage::WriteToFile(char *fpath)
-{
-
+bool Storage::Sync(void) {
+  return WriteToFile("agenda.data");
 }
 
-// singleton
-Storage& Storage::GetInstance(void)
-{
-
+void Storage::CreateUser(const User& user_) {
+  userList_.push_back(user_);
 }
 
-Storage::~Storage()
-{
-
+std::list<User> Storage::QueryUser(std::function<bool(const User&)> filter) {
+  std::list<User> v;
+  for (auto i : userList_) {
+    if (filter(i))
+      v.push_back(i);
+  }
+  return v;
 }
 
-// CRUD for User & Meeting using C++11 Lambda Expressions
-void Storage::CreateUser(const User&)
-{
-
+int Storage::UpdateUser(std::function<bool(const User&)> filter, std::function<void(User&)> switcher) {
+  int result = 0;
+  for (auto i : userList_) {
+    if (filter(i)) {
+      switcher(i);
+      result++;
+    }
+  }
+  return result;
 }
 
-std::list<User> Storage::
-QueryUser(std::function<Storage::
-bool(const User&)> filter)
-{
-
+int Storage::DeleteUser(std::function<bool(const User&)> filter) {
+  int result = 0;
+  for (auto i = userList_.begin(); i != userList_.end(); ++i) {
+    if (filter(*i)) {
+      auto tmpit = i;
+      --i;
+      userList_.erase(tmpit);
+      result++;
+    }
+  }
+  return result;
 }
 
-int Storage::
-UpdateUser(std::function<Storage::
-bool(const User&)> filter, std::function<Storage::
-void(User&)> switcher)
-{
-
+void Storage::CreateMeeting(const Meeting& meeting_) {
+  meetingList_.push_back(meeting_);
 }
 
-int Storage::
-DeleteUser(std::function<Storage::
-bool(const User&)> filter)
-{
-
+std::list<Meeting> Storage::QueryMeeting(std::function<bool(const Meeting&)> filter) {
+  std::list<Meeting> v;
+  for (auto i : meetingList_) {
+    if (filter(i))
+      v.push_back(i);
+  }
+  return v;
 }
 
-void Storage::CreateMeeting(const Meeting&)
-{
-
+int Storage::UpdateMeeting(std::function<bool(const Meeting&)> filter, std::function<void(Meeting&)> switcher) {
+  int result = 0;
+  for (auto i : meetingList_) {
+    if (filter(i)) {
+      switcher(i);
+      result++;
+    }
+  }
+  return result;
 }
 
-std::list<Meeting> Storage::
-QueryMeeting(std::function<Storage::
-bool(const Meeting&)> filter)
-{
-
+int Storage::DeleteMeeting(std::function<bool(const Meeting&)> filter) {
+  int result = 0;
+  for (auto i = meetingList_.begin(); i != meetingList_.end(); ++i) {
+    if (filter(*i)) {
+      auto tmpit = i;
+      --i;
+      meetingList_.erase(tmpit);
+      result++;
+    }
+  }
+  return result;
 }
 
-int Storage::
-UpdateMeeting(std::function<Storage::
-bool(const Meeting&)> filter, std::function<Storage::
-void(Meeting&)> switcher)
-{
-
+bool Storage::ReadFromFile(char *filename) {
+  ;
 }
 
-int Storage::
-DeleteMeeting(std::function<Storage::
-bool(const Meeting&)> filter)
-{
-
+bool Storage::WriteToFile(char *filename) {
+  ;
 }
-
-// File IO
-bool Storage::Sync(void)
-{
-
-}
-

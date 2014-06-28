@@ -1,30 +1,33 @@
-all : agenda install
+CC=g++
+CFLAGS=-c -g -rdynamic -Wall -std=c++0x
+
+all : agenda
 
 agenda : Date.o User.o Meeting.o Storage.o AgendaService.o AgendaUI.o \
 	     Agenda.o
-	g++ -o agenda Date.o User.o Meeting.o Storage.o \
+	$(CC) -o agenda -g -rdynamic Date.o User.o Meeting.o Storage.o \
 	AgendaService.o AgendaUI.o Agenda.o
 
 Date.o : Date.h Date.cpp
-	g++ -c Date.cpp
+	$(CC) $(CFLAGS) Date.cpp
 
 User.o : User.h User.cpp
-	g++ -c User.cpp
+	$(CC) $(CFLAGS) User.cpp
 
 Meeting.o : Meeting.h Meeting.cpp
-	g++ -c Meeting.cpp
+	$(CC) $(CFLAGS) Meeting.cpp
 
 Storage.o : Storage.h Storage.cpp
-	g++ -c Storage.cpp
+	$(CC) $(CFLAGS) Storage.cpp
 
 AgendaService.o : AgendaService.h AgendaService.cpp
-	g++ -c AgendaService.cpp
+	$(CC) $(CFLAGS) AgendaService.cpp
 
 AgendaUI.o : AgendaUI.h AgendaUI.cpp
-	g++ -c AgendaUI.cpp
+	$(CC) $(CFLAGS) AgendaUI.cpp
 
-Agenda.o : Agenda.cpp AgendaController.h
-	g++ -c Agenda.cpp
+Agenda.o : Agenda.cpp AgendaUI.h
+	$(CC) $(CFLAGS) Agenda.cpp
 
 clean :
 	rm *.o *~ agenda
