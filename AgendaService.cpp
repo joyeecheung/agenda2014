@@ -189,7 +189,7 @@ bool AgendaService::deleteAllMeetings(std::string userName) {
 }
 
 void AgendaService::startAgenda(void) {
-  storage_->sync();
+  ;
 }
 
 void AgendaService::quitAgenda(void) {
