@@ -61,25 +61,8 @@ bool AgendaUI::executeOperation(std::string op) {
                                         "las", "lap", "qm", "qt",
                                         "dm", "da"
                                        };
-
-      std::cout << "\n-------------------------Agenda------------------------\n"
-                << "Action : \n"
-                << "o   - log out Agenda\n"
-                << "dc  - delete Agenda account\n"
-                << "lu  - list all Agenda user\n"
-                << "cm  - create a meeting\n"
-                << "la  - list all meetings\n"
-                << "las - list all sponsor meetings\n"
-                << "lap - list all participate meetings\n"
-                << "qm  - query meeting by title\n"
-                << "qt  - query meeting by time interval\n"
-                << "dm  - delete meeting by title\n"
-                << "da  - delete all meetings\n"
-                << "-------------------------------------------------------\n"
-                << "\nAgenda@" << currentUser_->getName() << " : # ";
-      std::cin >> nextop;
-      std::cout << '\n';
-
+      nextop = getCmd();
+      
       if (nextop == ops[LogOut]) {
         userLogOut();
       } else if (nextop == ops[DeleteAccount]) {
@@ -259,6 +242,24 @@ void AgendaUI::printMeetings(std::list<Meeting> meetings) {
 
 // own functions
 std::string AgendaUI::getCmd(void) {
-
+  std::string cmd;
+  std::cout << "\n-------------------------Agenda------------------------\n"
+            << "Action : \n"
+            << "o   - log out Agenda\n"
+            << "dc  - delete Agenda account\n"
+            << "lu  - list all Agenda user\n"
+            << "cm  - create a meeting\n"
+            << "la  - list all meetings\n"
+            << "las - list all sponsor meetings\n"
+            << "lap - list all participate meetings\n"
+            << "qm  - query meeting by title\n"
+            << "qt  - query meeting by time interval\n"
+            << "dm  - delete meeting by title\n"
+            << "da  - delete all meetings\n"
+            << "-------------------------------------------------------\n"
+            << "\nAgenda@" << currentUser_->getName() << " : # ";
+  std::cin >> cmd;
+  std::cout << '\n';
+  return cmd;
 }
 

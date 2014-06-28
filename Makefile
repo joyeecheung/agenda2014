@@ -1,12 +1,20 @@
 CC=g++
 CFLAGS=-c -g -rdynamic -Wall -std=c++0x
 
+OBJS=Date.o User.o Meeting.o Storage.o AgendaService.o AgendaUI.o
+
 all : agenda
 
 agenda : Date.o User.o Meeting.o Storage.o AgendaService.o AgendaUI.o \
 	     Agenda.o
 	$(CC) -o agenda -g -rdynamic Date.o User.o Meeting.o Storage.o \
 	AgendaService.o AgendaUI.o Agenda.o
+
+test : $(OBJS) write.o
+	$(CC) -o test -g -rdynamic $(OBJS) write.o
+
+write.o : write.cpp
+	$(CC) $(CFLAGS) write.cpp
 
 Date.o : Date.h Date.cpp
 	$(CC) $(CFLAGS) Date.cpp
@@ -31,3 +39,5 @@ Agenda.o : Agenda.cpp AgendaUI.h
 
 clean :
 	rm *.o *~ agenda
+
+.PHONY: test

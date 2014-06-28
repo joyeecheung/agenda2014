@@ -162,12 +162,16 @@ bool Storage::readFromFile(const char* fpath) {
 
   while (fin.getline(buffer, 256, '\n')) {
     line = buffer;
+
+    // get each field e.g. "name:"user1""
     std::vector<std::string> fields;
     std::string rawLine = line.substr(1, line.size()-2);
     split(fields, rawLine, ',');
 
+    // get the type of the fields in this line
     objType type = findType(fields);
 
+    // if it's collection:xx, register th total count
     if (type == userColl || type == meetingColl) {
       int total;
       for (auto field : fields) {
@@ -183,11 +187,13 @@ bool Storage::readFromFile(const char* fpath) {
       else
         meetingTotal = total;
     } else if (type == user) {
+      // if it's the info of a user, create a new user and save it
       std::string name, password, email, phone;
       for (auto field : fields) {
         std::vector<std::string> kv;
         split(kv, field, ':');
 
+        // get the fields
         if (kv[0] == "name")
           name = kv[1].substr(1, kv[1].size()-2);
         else if (kv[0] == "password")
@@ -200,11 +206,13 @@ bool Storage::readFromFile(const char* fpath) {
 
       createUser(User(name, password, email, phone));
     } else if (type == meeting) {
+      // if it's the info of a meeting, create a new meeting and save it
       std::string sponsor, participator, sdate, edate, title;
       for (auto field : fields) {
         std::vector<std::string> kv;
         split(kv, field, ':');
 
+        // get the fields
         if (kv[0] == "sponsor")
           sponsor = kv[1].substr(1, kv[1].size()-2);
         else if (kv[0] == "participator")
@@ -228,5 +236,38 @@ bool Storage::readFromFile(const char* fpath) {
 }
 
 bool Storage::writeToFile(const char* fpath) {
-  ;
+  std::ofstream fout;
+
+  fout.open(fpath, std::ofstream::out);
+
+  if (!fout)
+    return false;
+
+  std::list<User> users = queryUser(
+    [](const User & user) { return true; }
+  );
+
+  fout << "{collection:\"User\",total:" << users.size() << "}\n";
+  for (auto user : users) {
+    fout << "{name:\"" << user.getName() << "\","
+         << "password:\"" << user.getPassword() << "\","
+         << "email:\"" << user.getEmail() << "\","
+         << "phone:\"" << user.getPhone() << "\"}\n"; 
+  }
+
+  std::list<Meeting> meetings = queryMeeting(
+    [](const Meeting & meeting) { return true; }
+  );
+
+  fout << "{collection:\"Meeting\",total:" << meetings.size() << "}\n";
+  for (auto meeting : meetings) {
+    fout << "{sponsor:\"" << meeting.getSponsor() << "\","
+         << "participator:\"" << meeting.getParticipator() << "\","
+         << "sdate:\"" << Date::dateToString(meeting.getStartDate()) << "\","
+         << "edate:\"" << Date::dateToString(meeting.getEndDate()) << "\","
+         << "title:\"" << meeting.getTitle() << "\"}\n"; 
+  }
+
+  fout.close();
+  return true;
 }
