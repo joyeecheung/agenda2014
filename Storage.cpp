@@ -3,13 +3,13 @@
 Storage* Storage::instance_ = nullptr;
 
 Storage::Storage() {
-  if (ReadFromFile("agenda.data") == false) {
+  if (readFromFile("agenda.data") == false) {
     userList_.clear();
     meetingList_.clear();
   }
 }
 
-Storage* Storage::GetInstance(void) {
+Storage* Storage::getInstance(void) {
   if (!instance_) {
     instance_ = new Storage();
   }
@@ -17,18 +17,18 @@ Storage* Storage::GetInstance(void) {
 }
 
 Storage::~Storage() {
-  WriteToFile("agenda.data");
+  sync();
 }
 
-bool Storage::Sync(void) {
-  return WriteToFile("agenda.data");
+bool Storage::sync(void) {
+  return writeToFile("agenda.data");
 }
 
-void Storage::CreateUser(const User& user_) {
+void Storage::createUser(const User &user_) {
   userList_.push_back(user_);
 }
 
-std::list<User> Storage::QueryUser(std::function<bool(const User&)> filter) {
+std::list<User> Storage::queryUser(std::function<bool(const User &)> filter) {
   std::list<User> v;
   for (auto i : userList_) {
     if (filter(i))
@@ -37,7 +37,8 @@ std::list<User> Storage::QueryUser(std::function<bool(const User&)> filter) {
   return v;
 }
 
-int Storage::UpdateUser(std::function<bool(const User&)> filter, std::function<void(User&)> switcher) {
+int Storage::updateUser(std::function<bool(const User &)> filter,
+                        std::function<void(User &)> switcher) {
   int result = 0;
   for (auto i : userList_) {
     if (filter(i)) {
@@ -48,7 +49,7 @@ int Storage::UpdateUser(std::function<bool(const User&)> filter, std::function<v
   return result;
 }
 
-int Storage::DeleteUser(std::function<bool(const User&)> filter) {
+int Storage::deleteUser(std::function<bool(const User &)> filter) {
   int result = 0;
   for (auto i = userList_.begin(); i != userList_.end(); ++i) {
     if (filter(*i)) {
@@ -61,11 +62,12 @@ int Storage::DeleteUser(std::function<bool(const User&)> filter) {
   return result;
 }
 
-void Storage::CreateMeeting(const Meeting& meeting_) {
+void Storage::createMeeting(const Meeting &meeting_) {
   meetingList_.push_back(meeting_);
 }
 
-std::list<Meeting> Storage::QueryMeeting(std::function<bool(const Meeting&)> filter) {
+std::list<Meeting> Storage::queryMeeting(
+    std::function<bool(const Meeting &)>filter) {
   std::list<Meeting> v;
   for (auto i : meetingList_) {
     if (filter(i))
@@ -74,7 +76,8 @@ std::list<Meeting> Storage::QueryMeeting(std::function<bool(const Meeting&)> fil
   return v;
 }
 
-int Storage::UpdateMeeting(std::function<bool(const Meeting&)> filter, std::function<void(Meeting&)> switcher) {
+int Storage::updateMeeting(std::function<bool(const Meeting &)> filter,
+                           std::function<void(Meeting &)> switcher) {
   int result = 0;
   for (auto i : meetingList_) {
     if (filter(i)) {
@@ -85,7 +88,7 @@ int Storage::UpdateMeeting(std::function<bool(const Meeting&)> filter, std::func
   return result;
 }
 
-int Storage::DeleteMeeting(std::function<bool(const Meeting&)> filter) {
+int Storage::deleteMeeting(std::function<bool(const Meeting &)> filter) {
   int result = 0;
   for (auto i = meetingList_.begin(); i != meetingList_.end(); ++i) {
     if (filter(*i)) {
@@ -98,10 +101,10 @@ int Storage::DeleteMeeting(std::function<bool(const Meeting&)> filter) {
   return result;
 }
 
-bool Storage::ReadFromFile(char *filename) {
+bool Storage::readFromFile(const char* fpath) {
   ;
 }
 
-bool Storage::WriteToFile(char *filename) {
+bool Storage::writeToFile(const char* fpath) {
   ;
 }

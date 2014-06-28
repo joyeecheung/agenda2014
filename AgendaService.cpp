@@ -1,7 +1,7 @@
 #include "AgendaService.h"
 
 AgendaService::AgendaService() {
-  storage_ = Storage::GetInstance();
+  storage_ = Storage::getInstance();
 }
 
 AgendaService::~AgendaService() {
@@ -10,7 +10,7 @@ AgendaService::~AgendaService() {
 
 bool AgendaService::
 userLogIn(std::string userName, std::string password) {
-  return !storage_->QueryUser(
+  return !storage_->queryUser(
     [&](const User & user) {
       return user.getName() == userName && user.getPassword() == password;
     }
@@ -22,10 +22,10 @@ userRegister(std::string userName, std::string password,
              std::string email, std::string phone) {
   User newUser(userName, password, email, phone);
 
-  if (storage_->QueryUser(
+  if (storage_->queryUser(
         [&](const User & user) { return user.getName() == userName; }
       ).empty()) {
-    storage_->CreateUser(newUser);
+    storage_->createUser(newUser);
     return true;
   }
 
@@ -38,7 +38,7 @@ bool AgendaService::deleteUser(std::string userName, std::string password) {
     return false;
   }
 
-  return storage_->DeleteUser(
+  return storage_->deleteUser(
       [&](const User & user) {
         return user.getName() == userName && user.getPassword() == password;
       }
@@ -46,7 +46,7 @@ bool AgendaService::deleteUser(std::string userName, std::string password) {
 }
 
 std::list<User> AgendaService::listAllUsers(void) {
-  return storage_->QueryUser(
+  return storage_->queryUser(
     [](const User & user) { return true; }
   );
 }
@@ -57,12 +57,12 @@ createMeeting(std::string userName, std::string title,
               std::string startDate, std::string endDate) {
   Date stime = Date::stringToDate(startDate);
   Date etime = Date::stringToDate(endDate);
-  bool userNotFound = storage_->QueryUser(
+  bool userNotFound = storage_->queryUser(
         [&](const User & user) {
           return user.getName() == userName;
         }
        ).empty();
-  bool participatorNotFound = storage_->QueryUser(
+  bool participatorNotFound = storage_->queryUser(
         [&](const User & user) {
           return user.getName() == participator;
         }
@@ -92,12 +92,12 @@ createMeeting(std::string userName, std::string title,
 
   Meeting newMeeting(userName, participator, Date::stringToDate(startDate),
                      Date::stringToDate(endDate), title);
-  storage_->CreateMeeting(newMeeting);
+  storage_->createMeeting(newMeeting);
   return true;
 }
 
 std::list<Meeting> AgendaService::meetingQuery(std::string title) {
-  return storage_->QueryMeeting(
+  return storage_->queryMeeting(
     [&](const Meeting & meeting) {
       return meeting.getTitle() == title;
     }
@@ -115,7 +115,7 @@ meetingQuery(std::string userName, std::string startDate,
     return std::list<Meeting>();
 
   // failed if the user doesn't exists
-  if (storage_->QueryUser(
+  if (storage_->queryUser(
         [&](const User & user) {
           return user.getName() == userName;
         }
@@ -123,14 +123,17 @@ meetingQuery(std::string userName, std::string startDate,
     return std::list<Meeting>();
   }
 
-  return storage_->QueryMeeting(
+  return storage_->queryMeeting(
     [&](const Meeting & meeting) {
-      if (meeting.getSponsor() == userName || meeting.getParticipator() == userName) {
+      if (meeting.getSponsor() == userName 
+          || meeting.getParticipator() == userName) {
         if (meeting.getStartDate() >= stime && meeting.getEndDate() <= etime)
           return true;
-        else if (meeting.getStartDate() <= etime && meeting.getEndDate() >= etime)
+        else if (meeting.getStartDate() <= etime
+                 && meeting.getEndDate() >= etime)
           return true;
-        else if (meeting.getStartDate() <= stime && meeting.getEndDate() >= stime)
+        else if (meeting.getStartDate() <= stime
+                 && meeting.getEndDate() >= stime)
           return true;
         else
           return false;
@@ -142,7 +145,7 @@ meetingQuery(std::string userName, std::string startDate,
 
 std::list<Meeting> AgendaService::
 listAllMeetings(std::string userName) {
-  return storage_->QueryMeeting(
+  return storage_->queryMeeting(
     [&](const Meeting & meeting) {
       return (meeting.getSponsor() == userName
               || meeting.getParticipator() == userName);
@@ -152,7 +155,7 @@ listAllMeetings(std::string userName) {
 
 std::list<Meeting> AgendaService::
 listAllSponsorMeetings(std::string userName) {
-  return storage_->QueryMeeting(
+  return storage_->queryMeeting(
     [&](const Meeting & meeting) {
       return meeting.getSponsor() == userName;
     }
@@ -161,7 +164,7 @@ listAllSponsorMeetings(std::string userName) {
 
 std::list<Meeting> AgendaService::
 listAllParticipateMeetings(std::string userName) {
-  return storage_->QueryMeeting(
+  return storage_->queryMeeting(
     [&](const Meeting & meeting) {
       return meeting.getParticipator() == userName;
     }
@@ -170,7 +173,7 @@ listAllParticipateMeetings(std::string userName) {
 
 bool AgendaService::
 deleteMeeting(std::string userName, std::string title) {
-  return storage_->DeleteMeeting(
+  return storage_->deleteMeeting(
     [&](const Meeting & meeting) {
       return meeting.getSponsor() == userName && meeting.getTitle() == title;
     }
@@ -178,7 +181,7 @@ deleteMeeting(std::string userName, std::string title) {
 }
 
 bool AgendaService::deleteAllMeetings(std::string userName) {
-  return storage_->DeleteMeeting(
+  return storage_->deleteMeeting(
     [&](const Meeting & meeting) {
       return meeting.getSponsor() == userName;
     }
@@ -186,9 +189,9 @@ bool AgendaService::deleteAllMeetings(std::string userName) {
 }
 
 void AgendaService::startAgenda(void) {
-  storage_->Sync();
+  storage_->sync();
 }
 
 void AgendaService::quitAgenda(void) {
-  storage_->Sync();
+  storage_->sync();
 }
