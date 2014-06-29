@@ -6,7 +6,7 @@ AgendaUI::AgendaUI(): userName_(), userPassword_(), agendaService_() {
   startAgenda();
 }
 
-void AgendaUI::getOperation(void) {
+void AgendaUI::OperationLoop(void) {
   std::cout << "-------------------------Agenda------------------------\n"
             << "Action : \n"
             << "l   - log in Agenda by user name and password\n"
@@ -61,7 +61,7 @@ bool AgendaUI::executeOperation(std::string op) {
                                         "las", "lap", "qm", "qt",
                                         "dm", "da"
                                        };
-      nextop = getCmd();
+      nextop = getOperation();
 
       if (nextop == ops[LogOut]) {
         userLogOut();
@@ -224,7 +224,7 @@ void AgendaUI::queryMeetingByTitle(void) {
   std::cin.getline(buffer, 256, '\n');
   std::string title = std::string(buffer);
 
-  printMeetings(agendaService_.meetingQuery(title));
+  printMeetings(agendaService_.meetingQuery(userName_, title));
 }
 
 void AgendaUI::queryMeetingByTimeInterval(void) {
@@ -280,7 +280,7 @@ void AgendaUI::printMeetings(std::list<Meeting> meetings) {
 }
 
 // own functions
-std::string AgendaUI::getCmd(void) {
+std::string AgendaUI::getOperation(void) {
   std::string cmd;
   std::cout << "\n-------------------------Agenda------------------------\n"
             << "Action : \n"

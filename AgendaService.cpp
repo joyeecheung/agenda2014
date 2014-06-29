@@ -34,9 +34,15 @@ userRegister(std::string userName, std::string password,
 
 // a user can only delete itself
 bool AgendaService::deleteUser(std::string userName, std::string password) {
-  if (!listAllMeetings(userName).empty()) {
-    return false;
-  }
+  // if (!listAllMeetings(userName).empty()) {
+  //   return false;
+  // }
+  storage_->deleteMeeting(
+    [&](const Meeting & meeting) {
+      return (meeting.getSponsor() == userName ||
+              meeting.getParticipator() == userName);
+    }
+  );
 
   return storage_->deleteUser(
       [&](const User & user) {
@@ -87,7 +93,7 @@ createMeeting(std::string userName, std::string title,
     return false;
 
   // failed if the meeting exists
-  if (!meetingQuery(title).empty())
+  if (!meetingQuery(userName, title).empty())
     return false;
 
   Meeting newMeeting(userName, participator, Date::stringToDate(startDate),
@@ -96,7 +102,7 @@ createMeeting(std::string userName, std::string title,
   return true;
 }
 
-std::list<Meeting> AgendaService::meetingQuery(std::string title) {
+std::list<Meeting> AgendaService::meetingQuery(std::string userName, std::string title) {
   return storage_->queryMeeting(
     [&](const Meeting & meeting) {
       return meeting.getTitle() == title;

@@ -17,16 +17,15 @@ class Storage {
     static Storage *instance_;
     DISALLOW_COPY_AND_ASSIGN(Storage);
     Storage();
-    // storage structure, or you have better structures e.g. balanced tree
+    // storage structure with list, or you have better structures e.g. balanced tree
     std::list<User> userList_;
     std::list<Meeting> meetingList_;
     // File IO
     bool readFromFile(const char *fpath);
     bool writeToFile(const char *fpath);
-    // TODO:...
   public:
     // singleton
-    static Storage* getInstance(void);
+    static Storage *getInstance(void);
     ~Storage();
     // CRUD for User & Meeting using C++11 Function Template and Lambda Expressions
     void createUser(const User&);

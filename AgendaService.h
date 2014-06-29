@@ -11,16 +11,16 @@ class AgendaService {
   ~AgendaService();
   bool userLogIn(std::string userName, std::string password);
   bool userRegister(std::string userName, std::string password,
-                  std::string email, std::string phone);
+                    std::string email, std::string phone);
   bool deleteUser(std::string userName, std::string password); // a user can only delete itself
   std::list<User> listAllUsers(void);
 
   bool createMeeting(std::string userName, std::string title,
-                   std::string participator,
-                   std::string startDate, std::string endDate);
-  std::list<Meeting> meetingQuery(std::string title);
+                     std::string participator,
+                     std::string startDate, std::string endDate);
+  std::list<Meeting> meetingQuery(std::string userName, std::string title);
   std::list<Meeting> meetingQuery(std::string userName, std::string startDate,
-                                std::string endDate);
+                                  std::string endDate);
   std::list<Meeting> listAllMeetings(std::string userName);
   std::list<Meeting> listAllSponsorMeetings(std::string userName);
   std::list<Meeting> listAllParticipateMeetings(std::string userName);
@@ -32,7 +32,6 @@ class AgendaService {
 
  private:
   Storage *storage_;
-  static int serviceRunning_;
 };
 
 #endif
