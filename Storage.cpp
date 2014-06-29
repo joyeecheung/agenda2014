@@ -12,12 +12,13 @@ namespace jsonHelp {
   objType findType(std::vector<std::string> &fields);
 
 };
+
 using namespace jsonHelp;
 
 void jsonHelp::split(std::vector<std::string> &tokens,
            const std::string &text, char sep) {
   int start = 0, end = 0;
-  
+
   while ((end = text.find(sep, start)) != std::string::npos) {
     tokens.push_back(text.substr(start, end - start));
     start = end + 1;
@@ -26,8 +27,7 @@ void jsonHelp::split(std::vector<std::string> &tokens,
   tokens.push_back(text.substr(start));
 }
 
-objType jsonHelp::findType(
-                  std::vector<std::string> &fields) {
+objType jsonHelp::findType(std::vector<std::string> &fields) {
   for (auto field : fields) {
     std::vector<std::string> kv;
     split(kv, field, ':');
@@ -36,15 +36,13 @@ objType jsonHelp::findType(
       return userColl;
     } else if (kv[0] == "collection" && kv[1] == "\"Meeting\"") {
       return meetingColl;
-    }
-    else if (kv[0] == "name") {
+    } else if (kv[0] == "name") {
       return user;
-    }
-    else if (kv[0] == "sponsor") {
+    } else if (kv[0] == "sponsor") {
       return meeting;
     }
   }
-  
+
   return error;
 }
 
@@ -218,15 +216,17 @@ bool Storage::readFromFile(const char* fpath) {
         else if (kv[0] == "participator")
           participator= kv[1].substr(1, kv[1].size()-2);
         else if (kv[0] == "sdate")
-          sdate = kv[1].substr(1, kv[1].size()-1) + ':' + kv[2].substr(0, kv[2].size()-1);
+          sdate = kv[1].substr(1, kv[1].size()-1) + ':' \
+                  + kv[2].substr(0, kv[2].size()-1);
         else if (kv[0] == "edate")
-          edate = kv[1].substr(1, kv[1].size()-1) + ':' + kv[2].substr(0, kv[2].size()-1);
+          edate = kv[1].substr(1, kv[1].size()-1) \
+                  + ':' + kv[2].substr(0, kv[2].size()-1);
         else
           title = kv[1].substr(1, kv[1].size()-2);
       }
 
       createMeeting(Meeting(sponsor, participator, Date::stringToDate(sdate),
-        Date::stringToDate(edate), title));
+                            Date::stringToDate(edate), title));
     } else {
       return false;
     }
@@ -244,20 +244,18 @@ bool Storage::writeToFile(const char* fpath) {
     return false;
 
   std::list<User> users = queryUser(
-    [](const User & user) { return true; }
-  );
+    [](const User & user) { return true; });
 
   fout << "{collection:\"User\",total:" << users.size() << "}\n";
   for (auto user : users) {
     fout << "{name:\"" << user.getName() << "\","
          << "password:\"" << user.getPassword() << "\","
          << "email:\"" << user.getEmail() << "\","
-         << "phone:\"" << user.getPhone() << "\"}\n"; 
+         << "phone:\"" << user.getPhone() << "\"}\n";
   }
 
   std::list<Meeting> meetings = queryMeeting(
-    [](const Meeting & meeting) { return true; }
-  );
+    [](const Meeting & meeting) { return true; });
 
   fout << "{collection:\"Meeting\",total:" << meetings.size() << "}\n";
   for (auto meeting : meetings) {
@@ -265,7 +263,7 @@ bool Storage::writeToFile(const char* fpath) {
          << "participator:\"" << meeting.getParticipator() << "\","
          << "sdate:\"" << Date::dateToString(meeting.getStartDate()) << "\","
          << "edate:\"" << Date::dateToString(meeting.getEndDate()) << "\","
-         << "title:\"" << meeting.getTitle() << "\"}\n"; 
+         << "title:\"" << meeting.getTitle() << "\"}\n";
   }
 
   fout.close();

@@ -12,9 +12,9 @@ bool AgendaService::
 userLogIn(std::string userName, std::string password) {
   return !storage_->queryUser(
     [&](const User & user) {
-      return user.getName() == userName && user.getPassword() == password;
-    }
-  ).empty();
+      return (user.getName() == userName
+             && user.getPassword() == password);
+    }).empty();
 }
 
 bool AgendaService::
@@ -23,8 +23,9 @@ userRegister(std::string userName, std::string password,
   User newUser(userName, password, email, phone);
 
   if (storage_->queryUser(
-        [&](const User & user) { return user.getName() == userName; }
-      ).empty()) {
+        [&](const User & user) {
+          return user.getName() == userName;
+        }).empty()) {
     storage_->createUser(newUser);
     return true;
   }
@@ -41,20 +42,17 @@ bool AgendaService::deleteUser(std::string userName, std::string password) {
     [&](const Meeting & meeting) {
       return (meeting.getSponsor() == userName ||
               meeting.getParticipator() == userName);
-    }
-  );
+    });
 
   return storage_->deleteUser(
       [&](const User & user) {
         return user.getName() == userName && user.getPassword() == password;
-      }
-    ) > 0;
+      }) > 0;
 }
 
 std::list<User> AgendaService::listAllUsers(void) {
   return storage_->queryUser(
-    [](const User & user) { return true; }
-  );
+    [](const User & user) { return true; });
 }
 
 bool AgendaService::
@@ -66,13 +64,11 @@ createMeeting(std::string userName, std::string title,
   bool userNotFound = storage_->queryUser(
         [&](const User & user) {
           return user.getName() == userName;
-        }
-       ).empty();
+        }).empty();
   bool participatorNotFound = storage_->queryUser(
         [&](const User & user) {
           return user.getName() == participator;
-        }
-       ).empty();
+        }).empty();
 
 
   // failed if there is only one person in the meeting
@@ -102,12 +98,12 @@ createMeeting(std::string userName, std::string title,
   return true;
 }
 
-std::list<Meeting> AgendaService::meetingQuery(std::string userName, std::string title) {
+std::list<Meeting> AgendaService::meetingQuery(std::string userName,
+                                               std::string title) {
   return storage_->queryMeeting(
     [&](const Meeting & meeting) {
       return meeting.getTitle() == title;
-    }
-  );
+    });
 }
 
 std::list<Meeting> AgendaService::
@@ -124,14 +120,13 @@ meetingQuery(std::string userName, std::string startDate,
   if (storage_->queryUser(
         [&](const User & user) {
           return user.getName() == userName;
-        }
-       ).empty()) {
+        }).empty()) {
     return std::list<Meeting>();
   }
 
   return storage_->queryMeeting(
     [&](const Meeting & meeting) {
-      if (meeting.getSponsor() == userName 
+      if (meeting.getSponsor() == userName
           || meeting.getParticipator() == userName) {
         if (meeting.getStartDate() >= stime && meeting.getEndDate() <= etime)
           return true;
@@ -145,8 +140,7 @@ meetingQuery(std::string userName, std::string startDate,
           return false;
       }
       return false;
-    }
-  );
+    });
 }
 
 std::list<Meeting> AgendaService::
@@ -155,8 +149,7 @@ listAllMeetings(std::string userName) {
     [&](const Meeting & meeting) {
       return (meeting.getSponsor() == userName
               || meeting.getParticipator() == userName);
-    }
-  );
+    });
 }
 
 std::list<Meeting> AgendaService::
@@ -164,8 +157,7 @@ listAllSponsorMeetings(std::string userName) {
   return storage_->queryMeeting(
     [&](const Meeting & meeting) {
       return meeting.getSponsor() == userName;
-    }
-  );
+    });
 }
 
 std::list<Meeting> AgendaService::
@@ -173,8 +165,7 @@ listAllParticipateMeetings(std::string userName) {
   return storage_->queryMeeting(
     [&](const Meeting & meeting) {
       return meeting.getParticipator() == userName;
-    }
-  );
+    });
 }
 
 bool AgendaService::
@@ -182,21 +173,17 @@ deleteMeeting(std::string userName, std::string title) {
   return storage_->deleteMeeting(
     [&](const Meeting & meeting) {
       return meeting.getSponsor() == userName && meeting.getTitle() == title;
-    }
-  ) > 0;
+    }) > 0;
 }
 
 bool AgendaService::deleteAllMeetings(std::string userName) {
   return storage_->deleteMeeting(
     [&](const Meeting & meeting) {
       return meeting.getSponsor() == userName;
-    }
-  ) > 0;
+    }) > 0;
 }
 
-void AgendaService::startAgenda(void) {
-  ;
-}
+void AgendaService::startAgenda(void) {}
 
 void AgendaService::quitAgenda(void) {
   storage_->sync();
