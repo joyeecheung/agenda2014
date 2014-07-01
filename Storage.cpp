@@ -85,9 +85,9 @@ std::list<User> Storage::queryUser(std::function<bool(const User &)> filter) {
 int Storage::updateUser(std::function<bool(const User &)> filter,
                         std::function<void(User &)> switcher) {
   int result = 0;
-  for (auto i : userList_) {
-    if (filter(i)) {
-      switcher(i);
+  for (auto i = userList_.begin(); i != userList_.end(); ++i) {
+    if (filter(*i)) {
+      switcher(*i);
       result++;
     }
   }
