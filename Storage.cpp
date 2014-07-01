@@ -62,6 +62,7 @@ Storage* Storage::getInstance(void) {
 }
 
 Storage::~Storage() {
+  instance_ = nullptr;
   sync();
 }
 
