@@ -103,7 +103,9 @@ std::list<Meeting> AgendaService::meetingQuery(std::string userName,
                                                std::string title) {
   return storage_->queryMeeting(
     [&](const Meeting & meeting) {
-      return meeting.getTitle() == title;
+      return (userName == meeting.getSponsor()
+              || userName == meeting.getParticipator()
+              || meeting.getTitle() == title);
     });
 }
 
