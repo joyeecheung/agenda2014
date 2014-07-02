@@ -38,6 +38,6 @@ Agenda.o : Agenda.cpp AgendaUI.h
 	$(CC) $(CFLAGS) Agenda.cpp
 
 clean :
-	rm *.o agenda *~
+	rm -f *.o agenda *~
 
 .PHONY: test

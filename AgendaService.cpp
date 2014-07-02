@@ -89,7 +89,8 @@ createMeeting(std::string userName, std::string title,
     return false;
 
   // failed if the meeting exists
-  if (!meetingQuery(userName, title).empty())
+  if (!meetingQuery(participator, title).empty()
+      || !meetingQuery(userName, title).empty())
     return false;
 
   Meeting newMeeting(userName, participator, Date::stringToDate(startDate),
