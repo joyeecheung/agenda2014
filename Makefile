@@ -10,11 +10,11 @@ agenda : Date.o User.o Meeting.o Storage.o AgendaService.o AgendaUI.o \
 	$(CC) -o agenda -g -rdynamic Date.o User.o Meeting.o Storage.o \
 	AgendaService.o AgendaUI.o Agenda.o
 
-test : $(OBJS) write.o
-	$(CC) -o test -g -rdynamic $(OBJS) write.o
+test : $(OBJS) Test.cpp SSTest.o
+	$(CC) -o test -g -rdynamic -std=c++0x $(OBJS) Test.cpp SSTest.o
 
-write.o : write.cpp
-	$(CC) $(CFLAGS) write.cpp
+SSTest.o : SSTest.h SSTest.cpp 
+	$(CC) $(CFLAGS) SSTest.h SSTest.cpp
 
 Date.o : Date.h Date.cpp
 	$(CC) $(CFLAGS) Date.cpp
@@ -38,6 +38,6 @@ Agenda.o : Agenda.cpp AgendaUI.h
 	$(CC) $(CFLAGS) Agenda.cpp
 
 clean :
-	rm -f *.o agenda *~
+	rm -f *.o agenda *~ agenda.data
 
 .PHONY: test

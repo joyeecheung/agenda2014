@@ -80,12 +80,31 @@ createMeeting(std::string userName, std::string title,
     return false;
 
   // failed if the times are not valid
-  if (!(Date::isValid(stime) && Date::isValid(etime) && stime <= etime))
+  if (!(Date::isValid(stime) && Date::isValid(etime) && stime < etime))
     return false;
 
   // failed if sponsor or participator is not available
-  if (!(meetingQuery(userName, startDate, endDate).empty()
-        && meetingQuery(participator, startDate, endDate).empty()))
+  // if the two meetings only intersects on the endpoint, they are available
+  // if (!(meetingQuery(userName, startDate, endDate).empty()
+  //      && meetingQuery(participator, startDate, endDate).empty()))
+  //  return false;
+  if (!storage_->queryMeeting(
+    [&](const Meeting &meeting) {
+      if (meeting.getSponsor() == userName
+          || meeting.getParticipator() == userName) {
+        if (meeting.getStartDate() >= stime && meeting.getEndDate() <= etime)
+          return true;
+        else if (meeting.getStartDate() < etime
+                 && meeting.getEndDate() >= etime)
+          return true;
+        else if (meeting.getStartDate() <= stime
+                 && meeting.getEndDate() > stime)
+          return true;
+        else
+          return false;
+      }
+      return false;
+  }).empty())
     return false;
 
   // failed if the meeting exists
@@ -99,13 +118,14 @@ createMeeting(std::string userName, std::string title,
   return true;
 }
 
+// get the list of the meeting that the user sponsor or participates in
 std::list<Meeting> AgendaService::meetingQuery(std::string userName,
                                                std::string title) {
   return storage_->queryMeeting(
     [&](const Meeting & meeting) {
-      return (userName == meeting.getSponsor()
-              || userName == meeting.getParticipator()
-              || meeting.getTitle() == title);
+      return ((userName == meeting.getSponsor()
+              || userName == meeting.getParticipator())
+              && meeting.getTitle() == title);
     });
 }
 
