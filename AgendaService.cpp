@@ -1,5 +1,5 @@
 #include "AgendaService.h"
-
+#include <iostream>
 AgendaService::AgendaService() {
   storage_ = Storage::getInstance();
 }
@@ -85,26 +85,29 @@ createMeeting(std::string userName, std::string title,
 
   // failed if sponsor or participator is not available
   // if the two meetings only intersects on the endpoint, they are available
-  // if (!(meetingQuery(userName, startDate, endDate).empty()
-  //      && meetingQuery(participator, startDate, endDate).empty()))
-  //  return false;
-  if (!storage_->queryMeeting(
-    [&](const Meeting &meeting) {
+  auto checkConflict = [&](const Meeting &meeting) {
       if (meeting.getSponsor() == userName
-          || meeting.getParticipator() == userName) {
-        if (meeting.getStartDate() >= stime && meeting.getEndDate() <= etime)
+          || meeting.getParticipator() == userName
+          || meeting.getSponsor() == participator
+          || meeting.getParticipator() == participator) {
+        if (meeting.getStartDate() >= stime 
+            && meeting.getEndDate() <= etime)  // inner inclusion
           return true;
         else if (meeting.getStartDate() < etime
-                 && meeting.getEndDate() >= etime)
+                 && meeting.getEndDate() >= etime)  // right intersection
           return true;
         else if (meeting.getStartDate() <= stime
-                 && meeting.getEndDate() > stime)
+                 && meeting.getEndDate() > stime)  // left intersection
           return true;
         else
-          return false;
+          return false;  // no intersection
       }
-      return false;
-  }).empty())
+      return false;  // they are not involved
+  };
+  
+  std::list<Meeting> conflict = storage_->queryMeeting(checkConflict);
+
+  if(!conflict.empty())
     return false;
 
   // failed if the meeting exists
@@ -112,6 +115,7 @@ createMeeting(std::string userName, std::string title,
       || !meetingQuery(userName, title).empty())
     return false;
 
+  // all good, insert the meeting into the list
   Meeting newMeeting(userName, participator, Date::stringToDate(startDate),
                      Date::stringToDate(endDate), title);
   storage_->createMeeting(newMeeting);

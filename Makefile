@@ -13,6 +13,9 @@ agenda : Date.o User.o Meeting.o Storage.o AgendaService.o AgendaUI.o \
 test : $(OBJS) Test.cpp SSTest.o
 	$(CC) -o test -g -rdynamic -std=c++0x $(OBJS) Test.cpp SSTest.o
 
+test2 : $(OBJS) Test.cpp
+	$(CC) -o test -g -rdynamic -std=c++0x $(OBJS) Test.cpp
+
 SSTest.o : SSTest.h SSTest.cpp 
 	$(CC) $(CFLAGS) SSTest.h SSTest.cpp
 

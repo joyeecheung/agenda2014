@@ -48,10 +48,12 @@ objType jsonHelp::findType(std::vector<std::string> &fields) {
 
 
 Storage::Storage() {
-  if (readFromFile("agenda.data") == false) {
-    userList_.clear();
-    meetingList_.clear();
-  }
+  // From example:
+  //if (readFromFile("agenda.data") == false) {
+  //  userList_.clear();
+  //  meetingList_.clear();
+  //}
+  readFromFile("agenda.data");
 }
 
 Storage* Storage::getInstance(void) {
